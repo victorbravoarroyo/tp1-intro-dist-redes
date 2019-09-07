@@ -1,4 +1,11 @@
 # 75.43 Introducción a Sistemas Distribuidos
+## Integrantes
+| Integrantes        |
+|--------------------|
+| Bravo, Victor      |
+| Prediger, Emiliano |
+| Spasiuk, Kevin     |
+
 ## TP #1
 Este repositorio contiene el template ya usado para el ejercicio #2. Nos basaremos en él para poder implementar el TP #1.
 
