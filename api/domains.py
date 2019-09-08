@@ -36,6 +36,7 @@ def crear(**kwargs):
     body = kwargs.get('body')
     domain = body.get('domain')
     ip = body.get('ip')
+
     if not domain or not ip:
         return abort(400)
 
@@ -60,10 +61,11 @@ def agregar(**kwargs):
     body = kwargs.get('body')
     domain = body.get('domain')
     ip = body.get('ip')
+
     if not domain or not ip:
         return abort(400)
 
-    if not domain in domains:
+    if not domain in custom_domains:
         return abort(404)
 
     rr = {
@@ -72,5 +74,5 @@ def agregar(**kwargs):
         'custom': True
     }
 
-    domains[domain].append(rr)
+    custom_domains[domain]['items'].append(rr)
     return make_response(rr, 200)
