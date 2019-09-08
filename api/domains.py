@@ -2,12 +2,12 @@ from flask import abort, make_response
 import dns.resolver
 import dns.rdatatype
 
-domains = {
+custom_domains = {
 }
 
 def obtener_uno(domain):
-    if not domain in domains:
-        domains[domain] = {'index': 0, 'custom_domains': []}
+    if not domain in custom_domains:
+        custom_domains[domain] = {'index': 0, 'items': []}
 
     try:
         result = dns.resolver.query(domain)
@@ -25,11 +25,11 @@ def obtener_uno(domain):
                 }
                 total_domains.append(rr)
 
-    total_domains += domains[domain]['custom_domains']
-    index = domains[domain]['index']
+    total_domains += custom_domains[domain]['items']
+    index = custom_domains[domain]['index']
     a_domain = total_domains[index]
     index += 1
-    domains[domain]['index'] = index if index < len(total_domains) else 0
+    custom_domains[domain]['index'] = index if index < len(total_domains) else 0
     return a_domain
 
 def crear(**kwargs):
@@ -39,8 +39,8 @@ def crear(**kwargs):
     if not domain or not ip:
         return abort(400)
 
-    for registers in domains.values():
-        for rr in registers:
+    for entries in domains.values():
+        for rr in entries['custom_domains']:
             if rr['ip'] == ip:
                 return abort(400)
 
