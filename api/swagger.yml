@@ -10,7 +10,7 @@ servers:
 
 # Paths servidos por la aplicación
 paths:
-  /domain/{domain}:
+  /domains/{domain}:
     get:
       operationId: "api.domains.obtener_uno"
       tags:
@@ -33,10 +33,6 @@ paths:
                 $ref: '#/components/schemas/Domain'
         404:
           description: 'Domain no encontrado'
-
-
-
-
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
