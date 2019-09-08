@@ -59,3 +59,12 @@ def agregar(**kwargs):
 
     if not domain in domains:
         return abort(404)
+
+    rr = {
+        'domain': domain,
+        'ip': ip,
+        'custom': True
+    }
+
+    domains[domain].append(rr)
+    return make_response(rr, 200)
