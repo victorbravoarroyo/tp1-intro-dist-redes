@@ -6,26 +6,31 @@ domains = {
 }
 
 def obtener_uno(domain):
-    if domain not in domains:
-        try:
-            result = dns.resolver.query(domain, dns.rdatatype.A)
-            domains[domain] = []
-        except:
-            return abort(404)
+    if not domain in domains:
+        domains[domain] = {'index': 0, 'custom_domains': []}
 
-        for answer in result.response.answer:
-            if answer.rdtype == dns.rdatatype.A:
-                for item in answer:
-                    rr = {
-                        'domain': domain,
-                        'ip': item.to_text(),
-                        'custom': False
-                    }
-                    domains[domain].append(rr)
+    try:
+        result = dns.resolver.query(domain)
+    except:
+        return abort(404)
 
-    first = domains[domain].pop(0)
-    domains[domain].append(first)
-    return first
+    total_domains = []
+    for answer in result.response.answer:
+        if answer.rdtype == dns.rdatatype.A:
+            for item in answer:
+                rr = {
+                    'domain': domain,
+                    'ip': item.to_text(),
+                    'custom': False
+                }
+                total_domains.append(rr)
+
+    total_domains += domains[domain]['custom_domains']
+    index = domains[domain]['index']
+    a_domain = total_domains[index]
+    index += 1
+    domains[domain]['index'] = index if index < len(total_domains) else 0
+    return a_domain
 
 def crear(**kwargs):
     body = kwargs.get('body')
