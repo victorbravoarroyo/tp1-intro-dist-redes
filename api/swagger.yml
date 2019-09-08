@@ -33,6 +33,29 @@ paths:
                 $ref: '#/components/schemas/Domain'
         404:
           description: 'Domain no encontrado'
+  /domains/custom-domain:
+    post:
+      operationId: "api.domains.crear"
+      tags:
+        - "Domains"
+      summary: "Alta de una custo domain"
+      description: "Crea un custom domain"
+      requestBody:
+        required: true
+        x-body-name: 'domain'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputDomain'
+      responses:
+        201:
+          description: "Se creo el custom-domain correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        400:
+          description: 'IP duplicada o falta un parametro'
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
@@ -124,6 +147,13 @@ components:
           type: "string"
         custom:
           type: "boolean"
+    InputDomain:
+      type: "object"
+      properties:
+          domain:
+            type: "string"
+          ip:
+            type: "string"
     Alumno:
       type: "object"
       properties:
