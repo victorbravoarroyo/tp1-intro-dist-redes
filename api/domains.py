@@ -56,3 +56,6 @@ def agregar(**kwargs):
     ip = body.get('ip')
     if not domain or not ip:
         return abort(400)
+
+    if not domain in domains:
+        return abort(404)
