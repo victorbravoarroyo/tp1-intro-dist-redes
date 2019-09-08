@@ -49,3 +49,10 @@ def crear(**kwargs):
         domains[domain] = []
     domains[domain].append(rr)
     return make_response(rr, 201)
+
+def agregar(**kwargs):
+    body = kwargs.get('body')
+    domain = body.get('domain')
+    ip = body.get('ip')
+    if not domain or not ip:
+        return abort(400)

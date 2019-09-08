@@ -56,6 +56,38 @@ paths:
                 $ref: '#/components/schemas/Domain'
         400:
           description: 'IP duplicada o falta un parametro'
+  /domains/custom-domain/{domain}:
+    put:
+      operationId: "api.domains.agregar"
+      tags:
+        - "Domains"
+      summary: "Agrega un custom-domain"
+      description: "Agrega una custom-domain"
+      parameters:
+        - in: path
+          name: domain
+          required: true
+          schema:
+            type: string
+          description: Domain al cual se quiere agregar un custom-domain
+      requestBody:
+        required: true
+        x-body-name: 'domain'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputDomain'
+      responses:
+        200:
+          description: "Se agrego un custom-domain correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        404:
+          description: "El dominio no existe"
+        400:
+          description: "Cuerpo mal formado"
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
