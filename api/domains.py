@@ -39,9 +39,9 @@ def crear(**kwargs):
     if not domain or not ip:
         return abort(400)
 
-    for entries in domains.values():
-        for rr in entries['custom_domains']:
-            if rr['ip'] == ip:
+    for entries in custom_domains.values():
+        for item in entries['items']:
+            if item['ip'] == ip:
                 return abort(400)
 
     rr = {
@@ -50,9 +50,10 @@ def crear(**kwargs):
         'custom': True
     }
 
-    if domain not in domains:
-        domains[domain] = []
-    domains[domain].append(rr)
+    if not domain in custom_domains:
+        custom_domains[domain] = {'index': 0, 'items': []}
+
+    custom_domains[domain]['items'].append(rr)
     return make_response(rr, 201)
 
 def agregar(**kwargs):
