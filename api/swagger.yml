@@ -88,6 +88,28 @@ paths:
           description: "El dominio no existe"
         400:
           description: "Cuerpo mal formado"
+    delete:
+      operationId: "api.domains.borrar"
+      tags:
+        - "Domains"
+      summary: "Borrar un custom domain"
+      description: "Borra, si existe, un custom domain"
+      parameters:
+        - in: path
+          name: domain
+          required: true
+          schema:
+            type: string
+          description: "El nombre del domain que se quiere borrar"
+      responses:
+        200:
+          description: "Operación de borrado exitosa"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDomain'
+        404:
+          description: "Domain no encontrado"
   /alumnos:
     get:
       operationId: "api.alumnos.obtener_todos"
@@ -185,6 +207,11 @@ components:
           domain:
             type: "string"
           ip:
+            type: "string"
+    ResponseDomain:
+      type: "object"
+      properties:
+          domain:
             type: "string"
     Alumno:
       type: "object"

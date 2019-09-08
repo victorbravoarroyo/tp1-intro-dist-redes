@@ -6,14 +6,15 @@ custom_domains = {
 }
 
 def obtener_uno(domain):
-    if not domain in custom_domains:
-        custom_domains[domain] = {'index': 0, 'items': []}
+    if domain in custom_domains:
+        return make_response(custom_domains[domain]['items'][0],200)
+        
+    custom_domains[domain] = {'index': 0, 'items': []}
 
     try:
         result = dns.resolver.query(domain)
     except:
         return abort(404)
-
     total_domains = []
     for answer in result.response.answer:
         if answer.rdtype == dns.rdatatype.A:
@@ -76,3 +77,12 @@ def agregar(**kwargs):
 
     custom_domains[domain]['items'].append(rr)
     return make_response(rr, 200)
+
+def borrar(domain):
+    if domain not in custom_domains:
+        return abort(404)
+    rr = {
+        'domain':domain,
+    }
+    del custom_domains[domain]
+    return make_response(rr,200)
