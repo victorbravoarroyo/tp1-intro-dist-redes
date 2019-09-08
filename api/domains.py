@@ -5,33 +5,31 @@ import dns.rdatatype
 custom_domains = {
 }
 
-def obtener_uno(domain):
-    if domain in custom_domains:
-        return make_response(custom_domains[domain]['items'][0],200)
-        
-    custom_domains[domain] = {'index': 0, 'items': []}
+def obtener_uno(domain): 
+    
+    if domain not in custom_domains:
+        try:
+            result = dns.resolver.query(domain)
+            total_domains = []
+            for answer in result.response.answer:
+                if answer.rdtype == dns.rdatatype.A:
+                    for item in answer:
+                        rr = {
+                            'domain': domain,
+                            'ip': item.to_text(),
+                            'custom': False
+                        }
+                        total_domains.append(rr)
+            
+            custom_domains[domain] = {'index': 0, 'items': total_domains}
+        except:
+            return abort(404)
 
-    try:
-        result = dns.resolver.query(domain)
-    except:
-        return abort(404)
-    total_domains = []
-    for answer in result.response.answer:
-        if answer.rdtype == dns.rdatatype.A:
-            for item in answer:
-                rr = {
-                    'domain': domain,
-                    'ip': item.to_text(),
-                    'custom': False
-                }
-                total_domains.append(rr)
-
-    total_domains += custom_domains[domain]['items']
     index = custom_domains[domain]['index']
-    a_domain = total_domains[index]
-    index += 1
-    custom_domains[domain]['index'] = index if index < len(total_domains) else 0
-    return a_domain
+    len_array_domains = len(custom_domains[domain]['items'])
+    a_domain = custom_domains[domain]['items'][index]
+    custom_domains[domain]['index'] = (index + 1) % len_array_domains
+    return make_response(a_domain,200)
 
 def crear(**kwargs):
     body = kwargs.get('body')
