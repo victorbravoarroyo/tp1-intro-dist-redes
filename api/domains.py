@@ -2,85 +2,46 @@ from flask import abort, make_response
 import dns.resolver
 import dns.rdatatype
 
-custom_domains = {
-}
+# Custom domains registrados
+# Contiene pares clave:valor del tipo 'domain'(string): 'ip' (string)
+custom_domains = {}
 
-def obtener_uno(domain): 
-    
-    if domain not in custom_domains:
-        try:
-            result = dns.resolver.query(domain)
-            total_domains = []
-            for answer in result.response.answer:
-                if answer.rdtype == dns.rdatatype.A:
-                    for item in answer:
-                        rr = {
-                            'domain': domain,
-                            'ip': item.to_text(),
-                            'custom': False
-                        }
-                        total_domains.append(rr)
-            
-            custom_domains[domain] = {'index': 0, 'items': total_domains}
-        except:
-            return abort(404)
+# Indices para los non-custom domains para mantener un orden en RR
+# Contiene pares clave:valor del tipo 'domain' (string): 'index' (int)
+indexes = {}
 
-    index = custom_domains[domain]['index']
-    len_array_domains = len(custom_domains[domain]['items'])
-    a_domain = custom_domains[domain]['items'][index]
-    custom_domains[domain]['index'] = (index + 1) % len_array_domains
-    return make_response(a_domain,200)
+def obtener_uno(domain):
+    if domain in custom_domains:
+        item = {
+            'domain': domain,
+            'ip': custom_domains.get(domain),
+            'custom': True
+        }
+        return make_response(item, 200)
+
+    try:
+        result = dns.resolver.query(domain)
+    except:
+        return abort(404)
+
+    if domain not in indexes:
+        indexes[domain] = 0
+
+    index = indexes.get(domain) % len(result)
+    item = {
+        'domain': domain,
+        'ip': str(result[index]),
+        'custom': False
+    }
+    indexes[domain] = index + 1
+    return make_response(item, 200)
+
 
 def crear(**kwargs):
-    body = kwargs.get('body')
-    domain = body.get('domain')
-    ip = body.get('ip')
-
-    if not domain or not ip:
-        return abort(400)
-
-    for entries in custom_domains.values():
-        for item in entries['items']:
-            if item['ip'] == ip:
-                return abort(400)
-
-    rr = {
-        'domain': domain,
-        'ip': ip,
-        'custom': True
-    }
-
-    if not domain in custom_domains:
-        custom_domains[domain] = {'index': 0, 'items': []}
-
-    custom_domains[domain]['items'].append(rr)
-    return make_response(rr, 201)
+    pass
 
 def agregar(**kwargs):
-    body = kwargs.get('body')
-    domain = body.get('domain')
-    ip = body.get('ip')
-
-    if not domain or not ip:
-        return abort(400)
-
-    if not domain in custom_domains:
-        return abort(404)
-
-    rr = {
-        'domain': domain,
-        'ip': ip,
-        'custom': True
-    }
-
-    custom_domains[domain]['items'].append(rr)
-    return make_response(rr, 200)
+    pass
 
 def borrar(domain):
-    if domain not in custom_domains:
-        return abort(404)
-    rr = {
-        'domain':domain,
-    }
-    del custom_domains[domain]
-    return make_response(rr,200)
+    pass
