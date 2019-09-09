@@ -11,6 +11,12 @@ custom_domains = {}
 indexes = {}
 
 def obtener_uno(domain):
+    """
+    Esta funcion maneja el request GET /api/domains/{domain}
+
+    :domain: domain del cual se quiere obtener su IP
+    :return: 200 domain, 404 domain no encontrado
+    """
     if domain in custom_domains:
         item = {
             'domain': domain,
@@ -38,7 +44,28 @@ def obtener_uno(domain):
 
 
 def crear(**kwargs):
-    pass
+    """
+    Esta funcion maneja el request POST /api/domain
+
+    :param body: custom domain a crear
+    :return: 201 custom domain creada, 400 domain duplicado o body mal formado
+    """
+    body = kwargs.get('body')
+    domain = body.get('domain')
+    ip = body.get('ip')
+    if not domain or not ip:
+        return abort(400)
+
+    if domain in custom_domains:
+        return abort(400)
+
+    custom_domains[domain] = ip
+    item = {
+        'domain': domain,
+        'ip': ip,
+        'custom': True
+    }
+    return make_response(item, 201)
 
 def agregar(**kwargs):
     pass
