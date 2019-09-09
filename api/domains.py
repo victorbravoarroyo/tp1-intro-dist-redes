@@ -59,6 +59,7 @@ def crear(**kwargs):
     if domain in custom_domains:
         return abort(400)
 
+    del indexes[domain]
     custom_domains[domain] = ip
     item = {
         'domain': domain,
@@ -93,4 +94,7 @@ def agregar(**kwargs):
 
 
 def borrar(domain):
+    pass
+
+def obtener_todos(filtro=""):
     pass
