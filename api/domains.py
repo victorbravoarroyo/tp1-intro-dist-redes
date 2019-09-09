@@ -45,7 +45,7 @@ def obtener_uno(domain):
 
 def crear(**kwargs):
     """
-    Esta funcion maneja el request POST /api/domain
+    Esta funcion maneja el request POST /api/domains
 
     :param body: custom domain a crear
     :return: 201 custom domain creada, 400 domain duplicado o body mal formado
@@ -68,7 +68,29 @@ def crear(**kwargs):
     return make_response(item, 201)
 
 def agregar(**kwargs):
-    pass
+    """
+    Esta funcion maneja el request PUT /api/domains/{domain}
+
+    :param body: custom domain a sobre-escribir
+    :return: 200 domain, 404 no existe domain, 400 mal formato
+    """
+    body = kwargs.get('body')
+    domain = body.get('domain')
+    ip = body.get('ip')
+    if not domain or not ip:
+        return abort(400)
+
+    if domain not in custom_domains:
+        return abort(404)
+
+    custom_domains[domain] = ip
+    item = {
+        'domain': domain,
+        'ip': ip,
+        'custom': True
+    }
+    return make_response(item, 200)
+
 
 def borrar(domain):
     pass
