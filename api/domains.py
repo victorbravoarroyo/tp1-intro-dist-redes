@@ -28,7 +28,11 @@ def obtener_uno(domain):
     try:
         result = dns.resolver.query(domain)
     except:
-        return abort(404)
+        error = {
+            'error': 'domain not found'
+        }
+        return make_response(error, 404)
+        # return abort(404)
 
     if domain not in indexes:
         indexes[domain] = 0
@@ -57,7 +61,11 @@ def crear(**kwargs):
         return abort(400)
 
     if domain in custom_domains:
-        return abort(400)
+        existingCustom = {
+            "error": "custom domain already exists"
+        }
+        return make_response(existingCustom, 400)
+        # return abort(400)
 
     custom_domains[domain] = ip
     item = {
@@ -78,7 +86,11 @@ def agregar(**kwargs):
     domain = body.get('domain')
     ip = body.get('ip')
     if not domain or not ip:
-        return abort(400)
+        error = {
+        "error": "payload is invalid"
+        }
+        return make_response(error, 400)
+        # return abort(400)
 
     if domain not in custom_domains:
         return abort(404)
@@ -107,10 +119,9 @@ def query_custom_domain():
     """
     Búsqueda de custom domains creados mediante parámetro 'q' en URL
     """
-
     query = request.args.get('q')
-
     items = []
+
     for domain in custom_domains:
         items.append({
             'domain': domain,

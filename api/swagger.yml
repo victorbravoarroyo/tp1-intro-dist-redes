@@ -33,12 +33,12 @@ paths:
                 $ref: '#/components/schemas/Domain'
         404:
           description: 'Domain no encontrado'
-  /domains/custom-domain:
+  /custom-domains:
     post:
       operationId: "api.domains.crear"
       tags:
         - "Domains"
-      summary: "Alta de una custo domain"
+      summary: "Alta de un custom domain"
       description: "Crea un custom domain"
       requestBody:
         required: true
@@ -56,7 +56,7 @@ paths:
                 $ref: '#/components/schemas/Domain'
         400:
           description: 'IP duplicada o falta un parametro'
-  /domains/custom-domain/{domain}:
+  /custom-domains/{domain}:
     put:
       operationId: "api.domains.agregar"
       tags:
