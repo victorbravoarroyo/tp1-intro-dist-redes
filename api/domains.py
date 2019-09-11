@@ -59,7 +59,6 @@ def crear(**kwargs):
     if domain in custom_domains:
         return abort(400)
 
-    # del indexes[domain]
     custom_domains[domain] = ip
     item = {
         'domain': domain,
@@ -93,7 +92,16 @@ def agregar(**kwargs):
     return make_response(item, 200)
 
 def borrar(domain):
-    pass
+    if domain not in custom_domains:
+        rr = {
+            'error': 'domain not found'
+        }
+        return make_response(rr,404)
+    rr = {
+        'domain':domain,
+    }
+    del custom_domains[domain]
+    return make_response(rr,200)
 
 def query_custom_domain():
     """
