@@ -1,4 +1,4 @@
-from flask import abort, make_response
+from flask import abort, make_response, request
 import dns.resolver
 import dns.rdatatype
 
@@ -59,7 +59,7 @@ def crear(**kwargs):
     if domain in custom_domains:
         return abort(400)
 
-    del indexes[domain]
+    # del indexes[domain]
     custom_domains[domain] = ip
     item = {
         'domain': domain,
@@ -92,9 +92,29 @@ def agregar(**kwargs):
     }
     return make_response(item, 200)
 
-
 def borrar(domain):
     pass
 
-def obtener_todos(filtro=""):
-    pass
+def query_custom_domain():
+    """
+    Búsqueda de custom domains creados mediante parámetro 'q' en URL
+    """
+
+    query = request.args.get('q')
+
+    items = []
+    for domain in custom_domains:
+        items.append({
+            'domain': domain,
+            'ip': custom_domains.get(domain),
+            'custom': True
+        })
+
+    if query:
+        items = [item for item in items if query in item.get('domain')]
+
+    response = {
+        "items": items
+    }
+
+    return make_response(response, 200)
