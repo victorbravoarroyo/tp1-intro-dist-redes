@@ -1,12 +1,18 @@
 openapi: 3.0.0
 info:
+  title: Trabajo Práctico 1
+  description: Una solución de DoH simplificada, implementando esta utilizando las herramientas...
   version: "1.0.0"
-  title: API de Alumnos
-  description: Documentación de la API de Alumnos de la materia 75.43 Introducción a Sistemas Distribuidos
 
 servers:
   - url: http://localhost:8080/api
     description: Servidor de desarrollo
+
+tags:
+  - name: "domains"
+    description: "Resolución de dominios"
+  - name: "custom-domains"
+    description: "Alta, baja y modificación de dominios personalizados"
 
 # Paths servidos por la aplicación
 paths:
@@ -14,32 +20,32 @@ paths:
     get:
       operationId: "api.domains.obtener_uno"
       tags:
-        - "Domains"
-      summary: "IP de un domain"
-      description: "Obtiene una IP de un domain"
+        - "domains"
+      summary: "Resolución de nombres de dominio"
+      description: "Obtiene la IP asociada a un dominio en particular, pudiendo ser este un custom domain creado previamente."
       parameters:
         - in: path
           name: domain
           required: true
           schema:
             type: string
-          description: El domain del cual se quiere conocer su IP
+          description: "El domain del cual se quiere conocer su IP"
       responses:
         200:
-          description: "Operacion de lectura exitosa"
+          description: Operacion de lectura exitosa
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Domain'
         404:
-          description: 'Domain no encontrado'
+          description: 'Dominio no encontrado'
   /custom-domains:
     post:
       operationId: "api.domains.crear"
       tags:
-        - "Domains"
+        - "custom-domains"
       summary: "Alta de un custom domain"
-      description: "Crea un custom domain"
+      description: "Crea una entrada para sobreescribir la IP de un dominio en particular"
       requestBody:
         required: true
         x-body-name: 'domain'
@@ -56,13 +62,33 @@ paths:
                 $ref: '#/components/schemas/Domain'
         400:
           description: 'IP duplicada o falta un parametro'
+    get:
+      operationId: api.domains.query_custom_domains
+      tags:
+        - "custom-domains"
+      summary: "Búsqueda de custom-domains"
+      description: "Permite el filtrado de custom-domains mediante el parámetro 'q'"
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: "dominio a buscar"
+          required: false
+      responses:
+        200:
+            description: ""
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Domain'
   /custom-domains/{domain}:
     put:
-      operationId: "api.domains.agregar"
+      operationId: "api.domains.editar"
       tags:
-        - "Domains"
-      summary: "Agrega un custom-domain"
-      description: "Agrega una custom-domain"
+        - "custom-domains"
+      summary: "Edición de un dominio en sistema"
+      description: "Se modifica un custom-domain ya existente"
       parameters:
         - in: path
           name: domain
@@ -79,7 +105,7 @@ paths:
               $ref: '#/components/schemas/InputDomain'
       responses:
         200:
-          description: "Se agrego un custom-domain correctamente"
+          description: "Se editó el custom-domain correctamente"
           content:
             application/json:
               schema:
@@ -91,8 +117,8 @@ paths:
     delete:
       operationId: "api.domains.borrar"
       tags:
-        - "Domains"
-      summary: "Borrar un custom domain"
+        - "custom-domains"
+      summary: "Borrado de un custom domain"
       description: "Borra, si existe, un custom domain"
       parameters:
         - in: path
@@ -110,155 +136,28 @@ paths:
                 $ref: '#/components/schemas/ResponseDomain'
         404:
           description: "Domain no encontrado"
-  /custom-domain:
-    get:
-      operationId: api.domains.query_custom_domain
-      tags:
-        - "Domains"
-      summary: "Resumen"
-      description: "Descripcion"
-      parameters:
-        - in: query
-          name: q
-          schema:
-            type: string
-          description: "dominio a buscar"
-          required: false
-      responses:
-        200:
-            description: ""
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ResponseDomain'
 
-  # /alumnos:
-  #   get:
-  #     operationId: "api.alumnos.obtener_todos"
-  #     tags:
-  #       - "Alumnos"
-  #     summary: "Colección de alumnos de la materia"
-  #     description: "Obtiene la lista de todos los alumnos de la materia existentes en el sistema"
-  #     responses:
-  #       200:
-  #         description: "Operación de lectura exitosa"
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: '#/components/schemas/Alumno'
-  #   post:
-  #     operationId: "api.alumnos.crear"
-  #     tags:
-  #       - "Alumnos"
-  #     summary: "Alta de un alumno de la materia"
-  #     description: "Crea un nuevo alumno y lo agrega a la lista de alumnos de la materia"
-  #     requestBody:
-  #       required: true
-  #       x-body-name: 'alumno'
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/InputAlumno'
-  #     responses:
-  #       201:
-  #         description: "Se creo el alumno correctamente"
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Alumno'
-  #       400:
-  #         description: "DNI o padron duplicado"
-  # /alumnos/{id_alumno}:
-  #   get:
-  #     operationId: "api.alumnos.obtener_uno"
-  #     tags:
-  #       - "Alumnos"
-  #     summary: "Alumno de la materia"
-  #     description: "Obtiene un alumno particular de la materia"
-  #     parameters:
-  #       - in: path
-  #         name: id_alumno
-  #         required: true
-  #         schema:
-  #           type: integer
-  #         description: El id del usuario a obtener
-  #     responses:
-  #       200:
-  #         description: "Operación de lectura exitosa"
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Alumno'
-  #       404:
-  #         description: "Alumno no encontrado"
-  #   delete:
-  #     operationId: "api.alumnos.borrar"
-  #     tags:
-  #       - "Alumnos"
-  #     summary: "Borrar alumno de la materia"
-  #     description: "Borra un alumno de la materia"
-  #     parameters:
-  #       - in: path
-  #         name: id_alumno
-  #         required: true
-  #         schema:
-  #           type: integer
-  #         description: El id del usuario a borrar
-  #     responses:
-  #       204:
-  #         description: "Operación de lectura exitosa"
-  #       404:
-  #         description: "Alumno no encontrado"
 # Declaración de tipos de datos
 components:
   schemas:
     Domain:
-      type: "object"
+      type: object
       properties:
         domain:
-          type: "string"
+          type: string
         ip:
-          type: "string"
+          type: string
         custom:
-          type: "boolean"
+          type: boolean
     InputDomain:
-      type: "object"
+      type: object
       properties:
-          domain:
-            type: "string"
-          ip:
-            type: "string"
+        domain:
+          type: string
+        ip:
+          type: string
     ResponseDomain:
-      type: "object"
+      type: object
       properties:
-          domain:
-            type: "string"
-    # Alumno:
-    #   type: "object"
-    #   properties:
-    #     id:
-    #       type: "number"
-    #     nombre:
-    #       type: "string"
-    #     dni:
-    #       type: "string"
-    #     padron:
-    #       type: "string"
-    # InputAlumno:
-    #   type: "object"
-    #   properties:
-    #     nombre:
-    #       type: "string"
-    #     dni:
-    #       type: "string"
-    #     padron:
-    #       type: "string"
-    # Error:
-    #   type: "object"
-    #   properties:
-    #     codigo:
-    #       type: "number"
-    #     mensaje:
-    #       type: "string"
+        domain:
+          type: string
