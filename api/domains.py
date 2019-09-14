@@ -1,13 +1,14 @@
 from flask import abort, make_response, request
 import dns.resolver
+from itertools import cycle
+
+# Cache para non-custom domains para mantener un orden en RR
+# Contiene pares clave:valor del tipo 'domain' (string): 'index' (iterable)
+domains = {}
 
 # Custom domains registrados
 # Contiene pares clave:valor del tipo 'domain'(string): 'ip' (string)
 custom_domains = {}
-
-# Indices para los non-custom domains para mantener un orden en RR
-# Contiene pares clave:valor del tipo 'domain' (string): 'index' (int)
-indexes = {}
 
 def obtener_uno(domain):
     """
@@ -24,26 +25,28 @@ def obtener_uno(domain):
         }
         return make_response(item, 200)
 
-    try:
-        result = dns.resolver.query(domain)
-    except:
-        error = {
-            'error': 'domain not found'
-        }
-        return make_response(error, 404)
+    # Resuelve dominio por primera vez
+    if domain not in domains:
+        try:
+            result = dns.resolver.query(domain)
+            ips = [ip for ip in result]
+            domains[domain] = cycle(ips)
+        except:
+            error = {
+                'error': 'domain not found'
+            }
+            return make_response(error, 404)
 
-    if domain not in indexes:
-        indexes[domain] = 0
+    # Obtengo siguiente IP round-robin
+    result = next(domains[domain])
 
-    index = indexes.get(domain) % len(result)
     item = {
         'domain': domain,
-        'ip': str(result[index]),
+        'ip': str(result),
         'custom': False
     }
-    indexes[domain] = index + 1
-    return make_response(item, 200)
 
+    return make_response(item, 200)
 
 def crear(**kwargs):
     """
