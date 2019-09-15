@@ -10,6 +10,26 @@ domains = {}
 # Contiene pares clave:valor del tipo 'domain'(string): 'ip' (string)
 custom_domains = {}
 
+def update_domain(domain):
+    """
+    Actualiza la coleccion de IPs para el domain eliminando las no disponibles
+    y agregando las nuevas.
+    Lanza excepcion en caso de que el domain no este disponible.
+    """
+    result = [str(ip) for ip in dns.resolver.query(domain)]
+
+    if domain not in domains:
+        domains[domain] = []
+
+    for saved_ip in domains.get(domain):
+        if saved_ip not in result:
+            domains.get(domain).remove(saved_ip)
+
+    for ip in result:
+        if ip not in domains.get(domain):
+            domains.get(domain).append(ip)
+
+
 def obtener_uno(domain):
     """
     Esta funcion maneja el request GET /api/domains/{domain}
@@ -25,24 +45,19 @@ def obtener_uno(domain):
         }
         return make_response(item, 200)
 
-    # Resuelve dominio por primera vez
-    if domain not in domains:
-        try:
-            result = dns.resolver.query(domain)
-            ips = [ip for ip in result]
-            domains[domain] = cycle(ips)
-        except:
-            error = {
-                'error': 'domain not found'
-            }
-            return make_response(error, 404)
+    try:
+        update_domain(domain)
+    except:
+        error = { 'error': 'domain not found' }
+        return make_response(error, 404)
 
     # Obtengo siguiente IP round-robin
-    result = next(domains[domain])
+
+    ip = domains.get(domain).pop(0)
 
     item = {
         'domain': domain,
-        'ip': str(result),
+        'ip': ip,
         'custom': False
     }
 
@@ -60,16 +75,12 @@ def crear(**kwargs):
     ip = body.get('ip')
 
     if not domain or not ip:
-        error = {
-            "error": "payload is invalid"
-        }
+        error = { "error": "payload is invalid" }
         return make_response(error, 400)
 
     if domain in custom_domains:
-        existingCustom = {
-            "error": "custom domain already exists"
-        }
-        return make_response(existingCustom, 400)
+        existing_custom = { "error": "custom domain already exists" }
+        return make_response(existing_custom, 400)
 
     custom_domains[domain] = ip
     item = {
@@ -92,15 +103,11 @@ def editar(domain, **kwargs):
     ip = body.get('ip')
 
     if domain not in custom_domains:
-        error = {
-            "error": "domain not found"
-        }
+        error = { "error": "domain not found" }
         return make_response(error, 404)
 
     if domain != body_domain or not body_domain or not ip :
-        error = {
-            "error": "payload is invalid"
-        }
+        error = { "error": "payload is invalid" }
         return make_response(error, 400)
 
     custom_domains[domain] = ip
@@ -119,14 +126,10 @@ def borrar(domain):
     :return:  200 domain, 404 dominio no encontrado
     """
     if domain not in custom_domains:
-        rr = {
-            'error': 'domain not found'
-        }
+        rr = { 'error': 'domain not found' }
         return make_response(rr, 404)
 
-    rr = {
-        'domain':domain,
-    }
+    rr = { 'domain':domain }
 
     del custom_domains[domain]
 
@@ -152,8 +155,7 @@ def query_custom_domains():
     if query:
         items = [item for item in items if query in item.get('domain')]
 
-    response = {
-        "items": items
-    }
+    items = sorted(items, key = lambda item: item.get('domain'))
+    response = { "items": items }
 
     return make_response(response, 200)
