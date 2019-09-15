@@ -3,7 +3,7 @@ import dns.resolver
 from itertools import cycle
 
 # Cache para non-custom domains para mantener un orden en RR
-# Contiene pares clave:valor del tipo 'domain' (string): 'index' (iterable)
+# Contiene pares clave:valor del tipo 'domain' (string): ips (lista)
 domains = {}
 
 # Custom domains registrados
