@@ -1,6 +1,5 @@
-from flask import abort, make_response, request
+from flask import make_response, request
 import dns.resolver
-from itertools import cycle
 
 # Cache para non-custom domains para mantener un orden en RR
 # Contiene pares clave:valor del tipo 'domain' (string): ips (lista)
